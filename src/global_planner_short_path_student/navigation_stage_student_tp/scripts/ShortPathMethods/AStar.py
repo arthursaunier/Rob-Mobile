@@ -15,10 +15,13 @@ class AStar(AbstractShortPath):
         print('')
 
     def goto(self, source, target, matrix, pub_marker, marker_container):
+        start = {'x': source['x'], 'y': source['y'], 'cost': 1}
+
         prev = {}
+        unvisited = {}
         #nodes to visit
         closedlist = []
-        openlist = []
+        openlist = [start]
 
         #dic with node score
         fscore = {}
@@ -26,31 +29,40 @@ class AStar(AbstractShortPath):
         
         INF = 9999
 
-        # Condition to stop the path finding algo
-        end = False
+        
         print('start processing')
 
         # Intialisation
-        for i in range(len(matrix)):
-            for j in range(len(matrix[0])):
-                # all nodes receive a score of INF
-                fscore[str(i) + '_' + str(j)] = INF
-                gscore[str(i) + '_' + str(j)] = INF
-                # all nodes are added to the list to process
-                openlist.append({'x': i, 'y': j})
+        for x in range(len(matrix)):
+            for y in range(len(matrix[0])):
+                unvisited = [str(x) + '_' + str(y)]
+
+        for c in unvisited:
+            # all nodes receive a score of INF
+            fscore[c] = INF
+            gscore[c] = INF
+            #prev node set to node
+            prev[c] = None
+    
         # score of the start node is set to 0
         fscore[str(source['x']) + '_' + str(source['y'])] = 0
         gscore[str(source['x']) + '_' + str(source['y'])] = 0
         print('end initialisation phase')
 
         # while their is node to process or goal is reached (early exit)
-        while len(openlist) != 0 and not end:
+        while len(openlist):
             # get the node with the lowest score
-            u = self.minScore(fscore, openlist)
+            u = None
+            u_score = INF
+            for h in openlist:
+                score = fscore[str(h['x']) + '_' + str(h['y'])]
+                if score < u_score:
+                    u_score = score
+                    u = h
             #print('current Node:' + str(u))
-            if u == str(target['x']) + '_' + str(target['y']):
+            if str(u['x']) + '_' + str(u['y']) == str(target['x']) + '_' + str(target['y']):
                 # end the path computation
-                end = True
+                return prev
             
             openlist.remove(u)
             closedlist.append(u)
@@ -64,21 +76,21 @@ class AStar(AbstractShortPath):
                 if self.inU(v, closedlist):
                    continue
                     
-                current_score = gscore[str(u['x']) + '_' + str(u['y'])] + self.hn(matrix, u, v)
+                v_score = gscore[str(u['x']) + '_' + str(u['y'])] + self.hn(matrix, u, v)
                 if not self.inU(v, openlist):
                     self.createFontierUnitMarkerPt(v, marker_container)
                     openlist.append(v)
-                elif current_score >= gscore[str(v['x']) + '_' + str(v['y'])]:
+                elif v_score >= gscore[str(v['x']) + '_' + str(v['y'])]:
                     continue
 
                 prev[str(v['x']) + '_' + str(v['y'])] = str(u['x']) + '_' + str(u['y'])
-                gscore[str(v['x']) + '_' + str(v['y'])] = current_score
+                gscore[str(v['x']) + '_' + str(v['y'])] = v_score
                 fscore[str(v['x']) + '_' + str(v['y'])] = gscore[str(v['x']) + '_' + str(v['y'])] + self.hn(matrix, v, target)
             
             pub_marker.publish(marker_container)
             rospy.sleep(self.SLEEP_TIME_BEFORE_NEXT_ITERATION)
             
-        return prev
+        return None
 
         ### TODO
         ###########################################################
