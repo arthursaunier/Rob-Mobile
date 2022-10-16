@@ -263,7 +263,15 @@ class LocalPlanner:
         if len(self.pathPoses) > 0 :
 
             #TODO for students : calculate angle . To compute shortest angle use method shortestAngleDiff defined before
+            quaternion = (
+                self.pathPoses[-1].pose.orientation.x,
+                self.pathPoses[-1].pose.orientation.y,
+                self.pathPoses[-1].pose.orientation.z,
+                self.pathPoses[-1].pose.orientation.w)
+            euler = euler_from_quaternion(quaternion)
 
+
+            angle = self.shortestAngleDiff(euler[2], self.curPose2D.theta)
             return angle       
         else:
             return 0
