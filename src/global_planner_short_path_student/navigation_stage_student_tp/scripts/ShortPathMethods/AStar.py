@@ -29,7 +29,8 @@ class AStar(AbstractShortPath):
         
         INF = 9999
 
-        
+        # Condition to stop the path finding algo
+        end = False
         print('start processing')
 
         # Intialisation
@@ -50,7 +51,7 @@ class AStar(AbstractShortPath):
         print('end initialisation phase')
 
         # while their is node to process or goal is reached (early exit)
-        while len(openlist):
+        while len(openlist) and not end:
             # get the node with the lowest score
             u = None
             u_score = INF
@@ -62,7 +63,7 @@ class AStar(AbstractShortPath):
             #print('current Node:' + str(u))
             if str(u['x']) + '_' + str(u['y']) == str(target['x']) + '_' + str(target['y']):
                 # end the path computation
-                return prev
+                end = True
             
             openlist.remove(u)
             closedlist.append(u)
@@ -90,7 +91,7 @@ class AStar(AbstractShortPath):
             pub_marker.publish(marker_container)
             rospy.sleep(self.SLEEP_TIME_BEFORE_NEXT_ITERATION)
             
-        return None
+        return prev
 
         ### TODO
         ###########################################################
