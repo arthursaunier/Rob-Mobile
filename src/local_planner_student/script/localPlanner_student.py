@@ -235,6 +235,19 @@ class LocalPlanner:
 
             #TODO for students : calculate distCurTarget and angle. To compute shortest angle use method shortestAngleDiff defined before
 
+            x_pos = self.curPose2D.x
+            y_pos = self.curPose2D.y
+            theta_pos = self.curPose2D.theta
+
+            x_target = self.pathPoses[0].pose.position.x
+            y_target = self.pathPoses[0].pose.position.y
+
+            angle = atan2(y_target-y_pos, x_target-x_pos)
+
+            angle = self.shortestAngleDiff(angle, theta_pos)
+
+            distCurTarget = sqrt((x_target - x_pos) * (x_target - x_pos) + (y_target - y_pos) * (y_target - y_pos))
+
             return (distCurTarget, angle)
         
         else:
