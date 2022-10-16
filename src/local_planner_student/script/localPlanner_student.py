@@ -345,10 +345,10 @@ class LocalPlanner:
 
             goalState = self.pathSequencer(dist, angle, finalOrientation)
 
-            if "" == goalState: #TODO for students : modify string matching with the state (help in pathSequencer docstring)
+            if "New Goal" == goalState: #TODO for students : modify string matching with the state (help in pathSequencer docstring)
                 (dist, angle) = self.computeDistAngle()
 
-            elif "" == goalState  or  "" == goalState :  #TODO for students : modify string matching with the state (help in pathSequencer docstring)        
+            elif "Last Goal pose (position + orientation) Reached" == goalState  or  "Last Goal position Reached" == goalState :  #TODO for students : modify string matching with the state (help in pathSequencer docstring)        
                 angle = finalOrientation
 
 
