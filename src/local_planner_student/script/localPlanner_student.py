@@ -305,16 +305,16 @@ class LocalPlanner:
 
         twist = Twist()
 
-        twist.angular.z = 0 #TODO for students : Apply gain and saturation (both ROSPARAM) to angle (as already done for linear velocity)
+        twist.angular.z = min(angle * self.K_angular, self.Sat_angular) #TODO for students : Apply gain and saturation (both ROSPARAM) to angle (as already done for linear velocity)
 
         if(fabs(angle) < self.Angle_to_allow_linear):
-            if "" == goalState or "" == goalState : #TODO for students : modify string matching with the state (help in pathSequencer docstring)
+            if "New Goal" == goalState or "Reach in progress" == goalState : #TODO for students : modify string matching with the state (help in pathSequencer docstring)
                 if self.isObstacle == True:
                     twist.linear.x = 0
                 else:
                     twist.linear.x = min(dist * self.K_linear, self.Sat_linear)   
 
-        if "" == goalState: #TODO for students : modify string matching with the state (help in pathSequencer docstring)
+        if "Last Goal pose (position + orientation) Reached" == goalState: #TODO for students : modify string matching with the state (help in pathSequencer docstring)
             twist.angular.z = 0
 
         return twist   
