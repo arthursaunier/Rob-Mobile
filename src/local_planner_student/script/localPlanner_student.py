@@ -279,13 +279,13 @@ class LocalPlanner:
             del self.pathPoses[0]
             #computeVelocity
             rospy.loginfo("# New goal : x=%f ; y=%f"  % ( self.pathPoses[0].pose.position.x, self.pathPoses[0].pose.position.y ) )
-            return "" #TODO for students : return string matching with the state
+            return "New Goal" #TODO for students : return string matching with the state
 
         elif(dist < self.Destination_error ) and len(self.pathPoses) == 1 :
             if fabs(finalOrientation) >= self.Angle_error :
-                state = "" #TODO for students : return string matching with the state
+                state = "Last Goal position Reached" #TODO for students : return string matching with the state
             else:
-                state = "" #TODO for students : return string matching with the state
+                state = "Last Goal pose (position + orientation) Reached" #TODO for students : return string matching with the state
 
             rospy.loginfo("# %s : X = %.2f ; Y = %.2f "  % ( state, self.pathPoses[0].pose.position.x, self.pathPoses[0].pose.position.y ) )
             return state
