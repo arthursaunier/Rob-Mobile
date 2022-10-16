@@ -150,6 +150,9 @@ class LocalPlanner:
         fb = Bool()
         listener = tf.TransformListener()
 
+        #log:
+        #[INFO] [1665951106.414706, 8.900000]: 'PathRequest' object has no attribute 'PathToGoal'
+
 
         try:
             now = rospy.Time(0)
