@@ -43,6 +43,11 @@ occupied_thresh:
 free_thresh:
 > L'espace libre sur la map (là où le robot peut se déplacer)
 
+## 1.5 Change observation source
+
+What do you observe ? Why ?
+> 
+
 
 
 
