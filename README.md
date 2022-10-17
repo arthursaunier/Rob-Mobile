@@ -142,3 +142,27 @@ En placant un objet devant le robot, l'objet est bien ajouté ds la local cost m
 ![inflate sur local planner](image/ObstacleV2.png)
 
 Le global planner ne prend toujours pas en compte l'obstacle comme on peut le voir.
+
+### 4.6 Third test of the obstacle layer
+
+Does the global planner take into account the obstacle ? Why ?
+
+Ask the robot to navigate far from the blocked door. Then ask it again to reach a goal behind the door blocked by the obstacle. What happen ? Why ? How is it possible to fix that ?
+
+Pour l'instant le global planner ne prend toujours pas en compte les obstacles, seulement le local planner les prend en compte. Donc dans ces cas, le robot va etre bloqué.
+
+![obstacle sur global costmap](image/Local.png)
+
+### 4.8 Fourth test of the obstacle layer
+
+What happen ? Why ? what is the difference with the new /move_base/global_costmap/costmap into rviz ? Why ?
+
+![obstacle sur global costmap](image/Global.png)
+
+Le global planner prend en comte la presence de l'obstacle et l'evite. l'algo de calcul de chemin prend donc en compte l'obstacle. Attention par contre, car si l'obstacle disparait, le chemin ne sera plus optimisé car le robot continuera de contourner l'obstacle alors au'il n'es plus présent.
+
+### 5.4 Second with 3D obstacle
+
+Dans ce cas, le robot va eviter la table pour atteindre l'objectif derriere.
+
+![obstacle 3D](image/Table.png)
