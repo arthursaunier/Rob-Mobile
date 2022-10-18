@@ -2,6 +2,7 @@
 # license removed for brevity
 __author__ = 'jacques saraydaryan'
 
+from copy import deepcopy
 import rospy
 import time
 import tf
@@ -16,7 +17,7 @@ from ShortPathMethods.WaveFront import WaveFront
 from ShortPathMethods.Dijkstra import Dijsktra
 from ShortPathMethods.GreedyBestFirstSearch import GreedyBestFirstSearch
 from ShortPathMethods.AStar import AStar
-# from local_planner_student.srv import Path as Path_Planner
+from local_planner_student.srv import Path as Path_Planner
 from Queue import Queue, LifoQueue
 
 class ShortPathMng:
@@ -65,7 +66,7 @@ class ShortPathMng:
         # ------------------#
         # ---- Service -----#
         # ------------------#
-        self.local_planner_service = ""
+        #self.local_planner_service = ""
         ### TODO
         ### create the link between our navigation ros node and our local_planner
         ### self.local_planner_service: service container to call the local_planner node
@@ -78,8 +79,9 @@ class ShortPathMng:
         #
         #
         #
-        #
-        ###
+
+        rospy.wait_for_service('/move_to/pathGoal')
+        self.local_planner_service = rospy.ServiceProxy('/move_to/pathGoal', Path_Planner)
 
     # ******************************************************************************************
     # ************************************   MAP PROCESSING   **********************************
@@ -389,9 +391,19 @@ class ShortPathMng:
             #
             #
             #
-            #
-            ###
-            print('')
+            pm = Path()
+            pm.header.frame_id = "/map"
+            pm.header.stamp = rospy.Time(0)
+
+            while not goalQueue.empty():
+                ps = goalQueue.get()
+                ps.header.frame_id = pm.header.frame_id
+                ps.header.stamp = rospy.Time(0)
+                pm.poses.append(deepcopy(ps))
+
+            t = self.local_planner_service(pm)
+            print("path sent to service")
+
         else:
             while not goalQueue.empty():
                 self.pub_goal.publish(goalQueue.get())
@@ -425,9 +437,9 @@ if __name__ == '__main__':
         # FIXME Check private or global ros param
         # RESOLUTION = rospy.get_param('~SHORT_PATH_RESOLUTION', 8)
         RESOLUTION = rospy.get_param('~SHORT_PATH_RESOLUTION', 4)
-        shortPathMethodeSelected = rospy.get_param('~SHORT_PATH_METHOD', 'ASTAR')
+        shortPathMethodeSelected = rospy.get_param('~SHORT_PATH_METHOD', 'DIJKSTRA')
         #shortPathMethodeSelected = rospy.get_param('~SHORT_PATH_METHOD', 'WAVEFRONT')
-        isLocalPlanner = rospy.get_param('~LOCAL_PLANNER_USED', False)
+        isLocalPlanner = rospy.get_param('~LOCAL_PLANNER_USED', True)
         inflate_radius = rospy.get_param('~INFLATE_RADIUS', 0.3)
         print("------>Used SHORT_PATH_METHOD: " + str(shortPathMethodeSelected))
 
