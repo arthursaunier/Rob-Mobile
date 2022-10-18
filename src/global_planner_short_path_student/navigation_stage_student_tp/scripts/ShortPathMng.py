@@ -122,7 +122,7 @@ class ShortPathMng:
             self.shortPathAlgoMap[shortPathMetodName].setMap(self.resizedMap, self.map_width, self.map_height,self.resolution,self.RESOLUTION)
             self.shortPathAlgoMap[shortPathMetodName].RESOLUTION = self.RESOLUTION
 
-    # **************************************************uggdfgdf
+    # **************************************************uggdfgdffggfd
     # ***************   INFLATE MAP    *****************
     # **************************************************
 
