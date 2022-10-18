@@ -8,20 +8,18 @@ from visualization_msgs.msg import MarkerArray
 
 # sys.path.append('../')
 
-
 class AStar(AbstractShortPath):
-    SLEEP_TIME_BEFORE_NEXT_ITERATION = 0.01
+    SLEEP_TIME_BEFORE_NEXT_ITERATION = 0.001
     def __init__(self):
         print('')
 
     def goto(self, source, target, matrix, pub_marker, marker_container):
-        start = {'x': source['x'], 'y': source['y'], 'cost': 1}
+        start = {'x': source['x'], 'y': source['y']}
 
         prev = {}
-        unvisited = {}
         #nodes to visit
         closedlist = []
-        openlist = [start]
+        openlist = []
 
         #dic with node score
         fscore = {}
@@ -34,20 +32,15 @@ class AStar(AbstractShortPath):
         print('start processing')
 
         # Intialisation
-        for x in range(len(matrix)):
-            for y in range(len(matrix[0])):
-                unvisited = [str(x) + '_' + str(y)]
-
-        for c in unvisited:
-            # all nodes receive a score of INF
-            fscore[c] = INF
-            gscore[c] = INF
-            #prev node set to node
-            prev[c] = None
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                fscore[str(i) + '_' + str(j)] = INF
+                gscore[str(i) + '_' + str(j)] = INF
     
         # score of the start node is set to 0
         fscore[str(source['x']) + '_' + str(source['y'])] = 0
         gscore[str(source['x']) + '_' + str(source['y'])] = 0
+        openlist.append(start)
         print('end initialisation phase')
 
         # while their is node to process or goal is reached (early exit)
@@ -83,7 +76,7 @@ class AStar(AbstractShortPath):
                     openlist.append(v)
                 elif v_score >= gscore[str(v['x']) + '_' + str(v['y'])]:
                     continue
-
+                        
                 prev[str(v['x']) + '_' + str(v['y'])] = str(u['x']) + '_' + str(u['y'])
                 gscore[str(v['x']) + '_' + str(v['y'])] = v_score
                 fscore[str(v['x']) + '_' + str(v['y'])] = gscore[str(v['x']) + '_' + str(v['y'])] + self.hn(matrix, v, target)
