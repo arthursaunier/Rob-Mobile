@@ -16,7 +16,7 @@ from std_msgs.msg import Bool
 from math import fabs, sqrt, atan2, pi, fmod
 
 from local_planner_student.srv import localGoal 
-from local_planner_student.srv import Path as PathToGoal 
+from local_planner_student.srv import Path as PathToGoal
 from copy import copy, deepcopy
 
 
@@ -97,11 +97,12 @@ class LocalPlanner:
         #TODO for students : Fill in self.curPose2D (help : use euler_from_quaternion)
         self.curPose2D.x = odom.pose.pose.position.x
         self.curPose2D.y = odom.pose.pose.position.y
+        
         quaternion = (odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w)
         euler = euler_from_quaternion(quaternion)
         self.curPose2D.theta = euler[2]
 
-        rospy.loginfo("Odom => X: %.2f \t Y: %.2f \t theta: %.2f"  % (self.curPose2D.x, self.curPose2D.y, self.curPose2D.theta ) )
+        #rospy.loginfo("Odom => X: %.2f \t Y: %.2f \t theta: %.2f"  % (self.curPose2D.x, self.curPose2D.y, self.curPose2D.theta ) )
 
                 
     def scanCallback(self, scan):
@@ -110,16 +111,17 @@ class LocalPlanner:
             Detect (set isObstacle = true) if obstacle. If obstacle detected, log once every 100 call of this function
         """        
         #TODO for students : If an obstacle below self.Obstacle_range is detected, then self.isObstacle = True, False otherwise
-        self.counter += 1
         ranges = numpy.array(scan.ranges)
         ranges = min(~numpy.isnan(ranges))
         if(ranges < self.Obstacle_range):
             self.isObstacle = True
+            self.counter += 1
+            if(self.counter >= 100):
+                rospy.loginfo("Obstacle => true --- distance: %.2f" , ranges)
+                self.counter = 0
         else:
             self.isObstacle = False
-        if(self.counter >= 100):
-            rospy.loginfo("Obstacle => true --- distance: %.2f" , ranges)
-            self.counter = 0
+        
 
 
 
@@ -157,23 +159,19 @@ class LocalPlanner:
         try:
             now = rospy.Time(0)
             listener.waitForTransform(req.pathToGoal.header.frame_id, "/odom", now, rospy.Duration(2.0))
-
-            (pos, quat) = listener.lookupTransform(req.pathToGoal.header.frame_id, "/odom", now)
-            x = pos[0]
-            y = pos[1]
+            #print(req)
+            #(pos, quat) = listener.lookupTransform(req.pathToGoal.header.frame_id, "/odom", now)
 
             for i in range( len(req.pathToGoal.poses) ) : 
                 
                 #TODO for students : Apply tranform on each PoseStamped with transformPose method out of tf.TransformListener()
-
-                listener.transformPose(req.PathToGoal.poses[i].pose.position.x, x)
-                listener.transformPose(req.PathToGoal.poses[i].pose.position.y, y)
+                
+                req.pathToGoal.poses[i] = listener.transformPose(req.pathToGoal.poses[i], "/odom")
                 
                 rospy.loginfo("# Pose %d : x = %.2f   y = %.2f" % (i, req.pathToGoal.poses[i].pose.position.x, req.pathToGoal.poses[i].pose.position.y) )
 
             del self.pathPoses[:]
             self.pathPoses = deepcopy( req.pathToGoal.poses )
-
             rospy.loginfo("### New path with %d poses" % int( len(self.pathPoses)  ) )
             fb.data = True
 
