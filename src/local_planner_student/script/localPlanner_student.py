@@ -57,6 +57,7 @@ class LocalPlanner:
         self.Waypoint_error         = Waypoint_error        # Euclidian distance error to a waypoint allowing to move to a new waypoint
         self.Destination_error      = Destination_error     # Euclidian distance error to the final waypoint below which we consider the position reached 
         self.Angle_error            = Angle_error           # Angular error below which we consider the final orientation reached
+        self.obstacleOccuration     = 0    
 
         # init ros node
         rospy.init_node('Planner', anonymous=False)
@@ -112,13 +113,14 @@ class LocalPlanner:
         """        
         #TODO for students : If an obstacle below self.Obstacle_range is detected, then self.isObstacle = True, False otherwise
         ranges = numpy.array(scan.ranges)
-        ranges = min(~numpy.isnan(ranges))
-        if(ranges < self.Obstacle_range):
+        ranges = ranges[~numpy.isnan(ranges)]
+        distance_to_obstacle = min(ranges)  
+        if(distance_to_obstacle < self.Obstacle_range):
+            if self.obstacleOccuration == 100 or self.obstacleOccuration == 0:
+                rospy.loginfo("There is an obstacle at " + str(distance_to_obstacle) + "m !!")
+                self.obstacleOccuration = 0
             self.isObstacle = True
-            self.counter += 1
-            if(self.counter >= 100):
-                rospy.loginfo("Obstacle => true --- distance: %.2f" , ranges)
-                self.counter = 0
+            self.obstacleOccuration += 1
         else:
             self.isObstacle = False
         
