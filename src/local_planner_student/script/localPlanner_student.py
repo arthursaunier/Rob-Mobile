@@ -159,14 +159,12 @@ class LocalPlanner:
         try:
             now = rospy.Time(0)
             listener.waitForTransform(req.pathToGoal.header.frame_id, "/odom", now, rospy.Duration(2.0))
-            #print(req)
-            #(pos, quat) = listener.lookupTransform(req.pathToGoal.header.frame_id, "/odom", now)
 
             for i in range( len(req.pathToGoal.poses) ) : 
                 
                 #TODO for students : Apply tranform on each PoseStamped with transformPose method out of tf.TransformListener()
                 
-                req.pathToGoal.poses[i] = listener.transformPose(req.pathToGoal.poses[i], "/odom")
+                req.pathToGoal.poses[i] = listener.transformPose("/odom", req.pathToGoal.poses[i])
                 
                 rospy.loginfo("# Pose %d : x = %.2f   y = %.2f" % (i, req.pathToGoal.poses[i].pose.position.x, req.pathToGoal.poses[i].pose.position.y) )
 
